@@ -10,10 +10,11 @@ module.exports = function (io) {
         */
         socket.on("userDrawing", (move) => {
             console.log("drawing")
-            io.emit("draw", move)
+            const id = socket.id
+            io.emit("draw", { ...move, id })
         })
         socket.on("stopDraw", () => {
-            io.emit("stopDraw", "")
+            io.emit("stopDraw", socket.id)
         })
         /*
             a client who is drawing hit the clear button

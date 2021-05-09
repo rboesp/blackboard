@@ -1,13 +1,24 @@
-const canvas = document.querySelector("#canvas")
+const canvas = document.querySelector("#client1")
 const ctx = canvas.getContext("2d")
+const canvas2 = document.querySelector("#client2")
+const ctx2 = canvas2.getContext("2d")
 const socket = io()
+// ctx.setLineDash([5, 3])
 
 // resize()
 
 //variables
 let painting = false
 
-canvas.style.background = "blue"
+ctx.lineWidth = 10
+ctx.lineCap = "round"
+ctx.strokeStyle = "red"
+ctx2.lineWidth = 10
+ctx2.lineCap = "round"
+ctx2.strokeStyle = "red"
+var bounds = canvas.getBoundingClientRect()
+
+// canvas.style.background = "blue"
 
 function translatedX(x) {
     var rect = canvas.getBoundingClientRect()
@@ -21,17 +32,14 @@ function translatedY(y) {
     return factor * (y - rect.top)
 }
 
-function draw(e) {
+function draw(e, clientDrawBox) {
     if (!painting) return
-    ctx.lineWidth = 10
-    ctx.lineCap = "round"
-    ctx.strokeStyle = "red"
-    var bounds = canvas.getBoundingClientRect()
-
-    ctx.beginPath()
-    ctx.lineTo(translatedX(e.clientX), translatedY(e.clientY))
-    ctx.stroke()
-    ctx.moveTo(translatedX(e.clientX), translatedY(e.clientY))
+    // ctx.beginPath()
+    // ctx.moveTo(translatedX(e.clientX), translatedY(e.clientY))
+    clientDrawBox.lineTo(translatedX(e.clientX), translatedY(e.clientY))
+    clientDrawBox.stroke()
+    clientDrawBox.moveTo(translatedX(e.clientX), translatedY(e.clientY))
+    // ctx.beginPath()
 }
 
 const moving = (event) => emit("userDrawing", event)
@@ -40,11 +48,12 @@ const moving = (event) => emit("userDrawing", event)
 // //do the body when emit comes back
 const emitStartPosition = (event) => {
     canvas.addEventListener("mousemove", moving) //thie next drags
+    canvas2.addEventListener("mousemove", moving) //thie next drags
     emit("userDrawing", event) //this time
 }
 
 const emit = (name, event) => {
-    console.log("emitting")
+    // console.log("emitting")
     const { clientX, clientY } = event
     socket.emit(name, { clientX, clientY })
 }
@@ -52,7 +61,7 @@ const emit = (name, event) => {
 //send
 //same as above
 const emitFinishedPosition = () => {
-    ctx.closePath()
+    // ctx.closePath()
     painting = false
     socket.emit("stopDraw", "")
 }
@@ -61,19 +70,29 @@ const emitFinishedPosition = () => {
 //EventListeners
 canvas.addEventListener("mousedown", emitStartPosition)
 canvas.addEventListener("mouseup", emitFinishedPosition)
+canvas2.addEventListener("mousedown", emitStartPosition)
+canvas2.addEventListener("mouseup", emitFinishedPosition)
 // canvas.addEventListener("mouseenter", drawing())
+
+function findCorrectClient(position) {
+    console.log(position.id, "***", socket.id)
+    return position.id === socket.id ? ctx : ctx2
+}
 
 /**SOCKET LISTENRS */
 socket.on("draw", (position) => {
     painting = true
-    console.log(position)
-    draw(position)
+    draw(position, findCorrectClient(position))
+    console.log(position.id)
 })
 
-socket.on("stopDraw", () => {
-    console.log("stop")
+socket.on("stopDraw", (id) => {
+    // console.log(socket.id)
     painting = false
     canvas.removeEventListener("mousemove", moving, false)
     // ctx.closePath()
+    canvas2.removeEventListener("mousemove", moving, false)
     ctx.beginPath()
+    ctx2.beginPath()
+    // console.log("stop")
 })
