@@ -28,9 +28,9 @@ function draw(e) {
     ctx.strokeStyle = "red"
     var bounds = canvas.getBoundingClientRect()
 
+    ctx.beginPath()
     ctx.lineTo(translatedX(e.clientX), translatedY(e.clientY))
     ctx.stroke()
-    ctx.beginPath()
     ctx.moveTo(translatedX(e.clientX), translatedY(e.clientY))
 }
 
@@ -52,6 +52,7 @@ const emit = (name, event) => {
 //send
 //same as above
 const emitFinishedPosition = () => {
+    ctx.closePath()
     painting = false
     socket.emit("stopDraw", "")
 }
@@ -73,5 +74,6 @@ socket.on("stopDraw", () => {
     console.log("stop")
     painting = false
     canvas.removeEventListener("mousemove", moving, false)
+    // ctx.closePath()
     ctx.beginPath()
 })
