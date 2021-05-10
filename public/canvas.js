@@ -1,33 +1,13 @@
-let canvas
-let ctx
-let bounds
+const canvas = document.querySelector("#canvas")
+const ctx = canvas.getContext("2d")
+ctx.lineWidth = 10
+ctx.lineCap = "round"
+ctx.strokeStyle = "red"
+const bounds = canvas.getBoundingClientRect()
 const socket = io()
 
-// document.getElementById("client1").style.border = "1px dashed blue"
-// document.getElementById("client2").style.border = "1px dashed blue"
-
-//variables
-let painting = false
-
-socket.on("player", (name) => {
-    canvas = document.querySelector(name)
-    canvas.style.border = "1px dashed red"
-    ctx = canvas.getContext("2d")
-    ctx.lineWidth = 10
-    ctx.lineCap = "round"
-    ctx.strokeStyle = "red"
-
-    bounds = canvas.getBoundingClientRect()
-
-    /**LISTENRS */
-    //EventListeners
-    canvas.addEventListener("mousedown", emitStartPosition)
-    canvas.addEventListener("mouseup", emitFinishedPosition)
-
-    console.log(canvas)
-})
-
-// canvas.style.background = "blue"
+canvas.addEventListener("mousedown", emitStartPosition)
+canvas.addEventListener("mouseup", emitFinishedPosition)
 
 function translatedX(x) {
     var rect = canvas.getBoundingClientRect()
@@ -41,30 +21,26 @@ function translatedY(y) {
     return factor * (y - rect.top)
 }
 
-function draw(e, clientDrawBox) {
+//variables
+let painting = false
+
+function draw(e) {
     if (!painting) return
     // ctx.beginPath()
-    clientDrawBox.lineTo(translatedX(e.clientX), translatedY(e.clientY))
-    clientDrawBox.stroke()
+    ctx.lineTo(translatedX(e.clientX), translatedY(e.clientY))
+    ctx.stroke()
     // clientDrawBox.beginPath()
-    clientDrawBox.moveTo(translatedX(e.clientX), translatedY(e.clientY))
+    ctx.moveTo(translatedX(e.clientX), translatedY(e.clientY))
     // clientDrawBox.closePath()
 }
 
-const moving = (event) => emit("userDrawing", event)
+const moving = (event) => emitDrawMove("userDrawing", event)
 
 //send
-// //do the body when emit comes back
 const emitStartPosition = (event) => {
-    canvas.addEventListener("mousemove", moving) //thie next drags
-    emit("userDrawing", event) //this time
+    canvas.addEventListener("mousemove", moving) //start capturing the user dragging mouse
+    emitDrawMove("userDrawing", event) //emit the current point, prob not needed
     ctx.beginPath()
-}
-
-const emit = (name, event) => {
-    // console.log("emitting")
-    const { clientX, clientY } = event
-    socket.emit(name, { clientX, clientY })
 }
 
 //send
@@ -75,10 +51,16 @@ const emitFinishedPosition = () => {
     socket.emit("stopDraw", "")
 }
 
+const emitDrawMove = (emitName, event) => {
+    // console.log("emitting")
+    const { clientX, clientY } = event
+    socket.emit(emitName, { clientX, clientY })
+}
+
 /**SOCKET LISTENRS */
 socket.on("draw", (position) => {
     painting = true
-    draw(position, ctx)
+    draw(position)
     console.log(position.id)
 })
 
