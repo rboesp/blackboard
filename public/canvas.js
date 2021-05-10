@@ -3,11 +3,15 @@ let ctx
 let bounds
 const socket = io()
 
+// document.getElementById("client1").style.border = "1px dashed blue"
+// document.getElementById("client2").style.border = "1px dashed blue"
+
 //variables
 let painting = false
 
 socket.on("player", (name) => {
     canvas = document.querySelector(name)
+    canvas.style.border = "1px dashed red"
     ctx = canvas.getContext("2d")
     ctx.lineWidth = 10
     ctx.lineCap = "round"
@@ -40,11 +44,11 @@ function translatedY(y) {
 function draw(e, clientDrawBox) {
     if (!painting) return
     // ctx.beginPath()
-    // ctx.moveTo(translatedX(e.clientX), translatedY(e.clientY))
     clientDrawBox.lineTo(translatedX(e.clientX), translatedY(e.clientY))
     clientDrawBox.stroke()
+    // clientDrawBox.beginPath()
     clientDrawBox.moveTo(translatedX(e.clientX), translatedY(e.clientY))
-    // ctx.beginPath()
+    // clientDrawBox.closePath()
 }
 
 const moving = (event) => emit("userDrawing", event)
@@ -54,6 +58,7 @@ const moving = (event) => emit("userDrawing", event)
 const emitStartPosition = (event) => {
     canvas.addEventListener("mousemove", moving) //thie next drags
     emit("userDrawing", event) //this time
+    ctx.beginPath()
 }
 
 const emit = (name, event) => {
@@ -65,7 +70,7 @@ const emit = (name, event) => {
 //send
 //same as above
 const emitFinishedPosition = () => {
-    // ctx.closePath()
+    ctx.closePath()
     painting = false
     socket.emit("stopDraw", "")
 }
@@ -82,6 +87,6 @@ socket.on("stopDraw", (id) => {
     painting = false
     canvas.removeEventListener("mousemove", moving, false)
     // ctx.closePath()
-    ctx.beginPath()
+    // ctx.beginPath()
     // console.log("stop")
 })
