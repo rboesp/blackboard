@@ -22,8 +22,8 @@ function translatedY(y) {
 }
 
 //variables
-let painting = false
 
+//functions
 function draw(e) {
     if (!painting) return
     // ctx.beginPath()
@@ -34,24 +34,24 @@ function draw(e) {
     // clientDrawBox.closePath()
 }
 
-const moving = (event) => emitDrawMove("userDrawing", event)
+//drawing - need this as as named function for removing listener
+const moving = (event) => emitDrawPoints("userDrawing", event)
 
-//send
+//start drawing
 const emitStartPosition = (event) => {
     canvas.addEventListener("mousemove", moving) //start capturing the user dragging mouse
-    emitDrawMove("userDrawing", event) //emit the current point, prob not needed
-    ctx.beginPath()
+    emitDrawPoints("userDrawing", event) //emit the current point, prob not needed
+    ctx.beginPath() //not here...
 }
 
-//send
-//same as above
+//a client released the mouse after drawing now done drawing
 const emitFinishedPosition = () => {
-    ctx.closePath()
-    painting = false
+    ctx.closePath() //not here...
     socket.emit("stopDraw", "")
 }
 
-const emitDrawMove = (emitName, event) => {
+//a client is actively drawing a line with mousedown
+const emitDrawPoints = (emitName, event) => {
     // console.log("emitting")
     const { clientX, clientY } = event
     socket.emit(emitName, { clientX, clientY })
@@ -59,14 +59,12 @@ const emitDrawMove = (emitName, event) => {
 
 /**SOCKET LISTENRS */
 socket.on("draw", (position) => {
-    painting = true
     draw(position)
     console.log(position.id)
 })
 
 socket.on("stopDraw", (id) => {
     // console.log(socket.id)
-    painting = false
     canvas.removeEventListener("mousemove", moving, false)
     // ctx.closePath()
     // ctx.beginPath()
