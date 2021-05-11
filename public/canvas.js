@@ -25,6 +25,7 @@ function translatedY(y) {
 
 //functions
 function draw(e) {
+    //need an id here
     if (!painting) return
     // ctx.beginPath()
     ctx.lineTo(translatedX(e.clientX), translatedY(e.clientY))
@@ -57,16 +58,18 @@ const emitDrawPoints = (emitName, event) => {
     socket.emit(emitName, { clientX, clientY })
 }
 
-/**SOCKET LISTENRS */
+/**SOCKET LISTENRS - ie receiving emits from server */
+
+//this handles mousedown and mousemove from client - either starting or drawing their line
 socket.on("draw", (position) => {
+    //this is where we need to know which client cause the emit
+    //
     draw(position)
     console.log(position.id)
 })
 
+//this handles mouseup from client - they are done drawing their line
 socket.on("stopDraw", (id) => {
-    // console.log(socket.id)
+    //here is where I would clear the clients old x y
     canvas.removeEventListener("mousemove", moving, false)
-    // ctx.closePath()
-    // ctx.beginPath()
-    // console.log("stop")
 })
