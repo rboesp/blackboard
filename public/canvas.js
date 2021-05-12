@@ -1,8 +1,8 @@
 const canvas = document.querySelector("#canvas")
 const ctx = canvas.getContext("2d")
-ctx.lineWidth = 10
+ctx.lineWidth = 1
 ctx.lineCap = "round"
-ctx.strokeStyle = "red"
+ctx.strokeStyle = "white"
 const bounds = canvas.getBoundingClientRect()
 const socket = io()
 
