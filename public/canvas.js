@@ -9,6 +9,7 @@ const player = () => {
 
 const players = new Map()
 
+//default
 const lineOptions = {
     lineWidth: 1,
     lineCap: "round",
@@ -40,10 +41,15 @@ function addNewPlayer(id) {
 }
 
 //variables
+const widths = {
+    small: 1,
+    med: 5,
+    large: 10,
+}
 
 //functions
 function drawLine(position, lastPosition, { lineWidth, lineCap, strokeStyle }) {
-    ctx.lineWidth = lineWidth
+    ctx.lineWidth = widths[`${lineWidth}`]
     ctx.lineCap = lineCap
     ctx.strokeStyle = strokeStyle
 
@@ -90,6 +96,12 @@ $(".btns").on("click", (e) => {
 })
 $(".clearBtn").on("click", (e) => {
     socket.emit("clear", "")
+})
+$(".type").on("click", (e) => {
+    lineOptions.lineCap = e.target.textContent
+})
+$(".size").on("click", (e) => {
+    lineOptions.lineWidth = e.target.textContent
 })
 
 /**SOCKET LISTENRS - ie receiving emits from server */
