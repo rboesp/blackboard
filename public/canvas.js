@@ -126,8 +126,8 @@ socket.on("draw", (clientDraw) => {
 //this handles mouseup from client - they are done drawing their line
 socket.on("stopDraw", (id) => {
     //clear the clients old x y
-    // addNewPlayer(id) //overwrite
-    players.set(id, player())
+    addNewPlayer(id) //overwrite
+    // players.set(id, player())
     console.log(players)
 })
 socket.on("clear", () => {
