@@ -5,6 +5,8 @@ module.exports = function (io) {
     io.on("connection", (socket) => {
         console.log(socket.id)
 
+        io.emit("addPlayer", socket.id)
+
         /*
             a client is actively drawing 
         */
@@ -24,6 +26,7 @@ module.exports = function (io) {
             io.emit("clearBoard", "")
         })
         socket.on("disconnect", () => {
+            io.emit("removePlayer", socket.id)
             console.log(socket.id + "left")
         })
     })
