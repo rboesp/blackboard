@@ -74,6 +74,7 @@ const emitStartPosition = (event) => {
 
 //a client released the mouse after drawing now done drawing
 const emitFinishedPosition = () => {
+    canvas.removeEventListener("mousemove", moving, false)
     socket.emit("stopDraw", "")
 }
 
@@ -84,7 +85,7 @@ const emitDrawPoints = (emitName, event) => {
 }
 
 function getLastPosition(id) {
-    console.log(players.get(id))
+    // const lastPos = ({  } = players.get(id))
     return players.get(id)
 }
 
@@ -125,9 +126,9 @@ socket.on("draw", (clientDraw) => {
 //this handles mouseup from client - they are done drawing their line
 socket.on("stopDraw", (id) => {
     //clear the clients old x y
-    addNewPlayer(id) //overwrite
-
-    canvas.removeEventListener("mousemove", moving, false)
+    // addNewPlayer(id) //overwrite
+    players.set(id, { lastPos: null })
+    console.log(players)
 })
 socket.on("clear", () => {
     ctx.clearRect(0, 0, canvas.width, canvas.height)
