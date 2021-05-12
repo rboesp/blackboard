@@ -4,7 +4,9 @@ const ctx = canvas.getContext("2d")
 const bounds = canvas.getBoundingClientRect()
 const socket = io()
 const player = () => {
-    lastPos: null
+    return {
+        lastPos: null,
+    }
 }
 
 const players = new Map()
@@ -109,12 +111,12 @@ $(".size").on("click", (e) => {
 //this handles mousedown and mousemove from client - either starting or drawing their line
 socket.on("draw", (clientDraw) => {
     const { clientX, clientY, options, id } = clientDraw
-    console.log(options)
+    // console.log(options)
     const position = { clientX, clientY }
     const lastPosition = getLastPosition(id) || position
     drawLine(position, lastPosition, options)
     updateLastPosition(position, id)
-    console.log(id)
+    // console.log(id)
 })
 
 //this handles mouseup from client - they are done drawing their line

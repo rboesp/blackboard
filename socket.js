@@ -31,7 +31,7 @@ module.exports = function (io) {
         })
         socket.on("disconnect", () => {
             io.emit("removePlayer", socket.id)
-            console.log(socket.id + "left")
+            // console.log(socket.id + " left")
         })
     })
 }
