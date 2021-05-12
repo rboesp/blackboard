@@ -3,7 +3,7 @@ const canvas = document.querySelector("#canvas")
 const ctx = canvas.getContext("2d")
 const bounds = canvas.getBoundingClientRect()
 const socket = io()
-const player = () => {
+function player() {
     console.log("***RESET***")
     return {
         lastPos: null,
@@ -127,7 +127,7 @@ socket.on("draw", (clientDraw) => {
 socket.on("stopDraw", (id) => {
     //clear the clients old x y
     // addNewPlayer(id) //overwrite
-    players.set(id, { lastPos: null })
+    players.set(id, player())
     console.log(players)
 })
 socket.on("clear", () => {
