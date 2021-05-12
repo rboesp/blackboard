@@ -4,6 +4,7 @@ const ctx = canvas.getContext("2d")
 const bounds = canvas.getBoundingClientRect()
 const socket = io()
 const player = () => {
+    console.log("***RESET***")
     return {
         lastPos: null,
     }
