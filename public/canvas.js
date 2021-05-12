@@ -21,7 +21,7 @@ const lineOptions = {
 
 socket.on("addPlayer", (id) => {
     //make player
-    addNewPlayer(id)
+    updateLastPosition(id, player())
 })
 socket.on("removePlayer", (id) => {
     players.delete(id)
@@ -37,10 +37,6 @@ function translatedY(y) {
     var rect = canvas.getBoundingClientRect()
     var factor = canvas.width / rect.width
     return factor * (y - rect.top)
-}
-
-function addNewPlayer(id) {
-    players.set(id, player())
 }
 
 //variables
@@ -85,11 +81,10 @@ const emitDrawPoints = (emitName, event) => {
 }
 
 function getLastPosition(id) {
-    // const lastPos = ({  } = players.get(id))
     return players.get(id)
 }
 
-function updateLastPosition(pos, id) {
+function updateLastPosition(id, pos) {
     players.set(id, pos)
 }
 
@@ -119,14 +114,14 @@ socket.on("draw", (clientDraw) => {
     const lastPosition = getLastPosition(id) || position
     // console.log(`LAST POSITION-- X: ${lastPosition.x} Y: ${lastPosition.y}`)
     drawLine(position, lastPosition, options)
-    updateLastPosition(position, id)
+    updateLastPosition(id, position)
     // console.log(id)
 })
 
 //this handles mouseup from client - they are done drawing their line
 socket.on("stopDraw", (id) => {
     //clear the clients old x y
-    addNewPlayer(id) //overwrite
+    updateLastPosition(id, player()) //overwrite
     // players.set(id, player())
     console.log(players)
 })
