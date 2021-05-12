@@ -13,7 +13,11 @@ module.exports = function (io) {
         socket.on("userDrawing", (move) => {
             console.log("drawing")
             const id = socket.id
-            io.emit("draw", { ...move, id })
+            const options = ({ lineWidth, lineCap, strokeStyle } = move)
+            io.emit("draw", { ...move, options, id })
+        })
+        socket.on("clear", () => {
+            io.emit("clear", "")
         })
         socket.on("stopDraw", () => {
             io.emit("stopDraw", socket.id)

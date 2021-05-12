@@ -1,15 +1,19 @@
+//constants
 const canvas = document.querySelector("#canvas")
 const ctx = canvas.getContext("2d")
-ctx.lineWidth = 1
-ctx.lineCap = "round"
-ctx.strokeStyle = "white"
 const bounds = canvas.getBoundingClientRect()
 const socket = io()
-
 const player = () => {
     lastPos: null
 }
+
 const players = new Map()
+
+const lineOptions = {
+    lineWidth: 1,
+    lineCap: "round",
+    strokeStyle: "white",
+}
 
 socket.on("addPlayer", (id) => {
     //make player
@@ -38,7 +42,11 @@ function addNewPlayer(id) {
 //variables
 
 //functions
-function drawLine(position, lastPosition) {
+function drawLine(position, lastPosition, { lineWidth, lineCap, strokeStyle }) {
+    ctx.lineWidth = lineWidth
+    ctx.lineCap = lineCap
+    ctx.strokeStyle = strokeStyle
+
     ctx.beginPath()
     ctx.moveTo(translatedX(lastPosition.clientX), translatedY(lastPosition.clientY))
     ctx.lineTo(translatedX(position.clientX), translatedY(position.clientY))
@@ -62,9 +70,8 @@ const emitFinishedPosition = () => {
 
 //a client is actively drawing a line with mousedown
 const emitDrawPoints = (emitName, event) => {
-    // console.log("emitting")
     const { clientX, clientY } = event
-    socket.emit(emitName, { clientX, clientY })
+    socket.emit(emitName, { clientX, clientY, ...lineOptions })
 }
 
 function getLastPosition(id) {
@@ -78,15 +85,22 @@ function updateLastPosition(pos, id) {
 /**EVENT LISTENERS */
 canvas.addEventListener("mousedown", emitStartPosition)
 canvas.addEventListener("mouseup", emitFinishedPosition)
+$(".btns").on("click", (e) => {
+    lineOptions.strokeStyle = e.target.textContent
+})
+$(".clearBtn").on("click", (e) => {
+    socket.emit("clear", "")
+})
 
 /**SOCKET LISTENRS - ie receiving emits from server */
 
 //this handles mousedown and mousemove from client - either starting or drawing their line
 socket.on("draw", (clientDraw) => {
-    const { clientX, clientY, id } = clientDraw
+    const { clientX, clientY, options, id } = clientDraw
+    console.log(options)
     const position = { clientX, clientY }
     const lastPosition = getLastPosition(id) || position
-    drawLine(position, lastPosition)
+    drawLine(position, lastPosition, options)
     updateLastPosition(position, id)
     console.log(id)
 })
@@ -97,4 +111,7 @@ socket.on("stopDraw", (id) => {
     addNewPlayer(id) //overwrite
 
     canvas.removeEventListener("mousemove", moving, false)
+})
+socket.on("clear", () => {
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
 })
