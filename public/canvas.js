@@ -84,6 +84,7 @@ const emitDrawPoints = (emitName, event) => {
 }
 
 function getLastPosition(id) {
+    console.log(players.get(id))
     return players.get(id)
 }
 
@@ -115,6 +116,7 @@ socket.on("draw", (clientDraw) => {
     // console.log(options)
     const position = { clientX, clientY }
     const lastPosition = getLastPosition(id) || position
+    // console.log(`LAST POSITION-- X: ${lastPosition.x} Y: ${lastPosition.y}`)
     drawLine(position, lastPosition, options)
     updateLastPosition(position, id)
     // console.log(id)
