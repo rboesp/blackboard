@@ -1,3 +1,3 @@
 # blackboard
-Multiplayer blackboard where you can draw on a canvas
+shareable online blackboard!
 ![](https://i.ibb.co/x6BLnjx/blackboard.png)
