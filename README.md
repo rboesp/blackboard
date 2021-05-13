@@ -1,2 +1,2 @@
-# whiteboard
-Multiplayer whiteboard over the internet!
+# blackboard
+Multiplayer blackboard over the internet!
