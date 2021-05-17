@@ -1,32 +1,30 @@
-//constants
+/*constants*/
 const canvas = document.querySelector("#canvas")
 const ctx = canvas.getContext("2d")
 const bounds = canvas.getBoundingClientRect()
-const socket = io()
-function player() {
-    console.log("***RESET***")
-    return {
-        lastPos: null,
-    }
-}
+const socket = io("http://localhost:3002/")
+
+socket.on("connect", () => {
+    console.log(socket.connected) // true
+    $(".spins").hide()
+})
 
 const players = new Map()
 
-//default
+//default options
 const lineOptions = {
     lineWidth: 1,
     lineCap: "round",
     strokeStyle: "white",
 }
 
-socket.on("addPlayer", (id) => {
-    //make player
-    updateLastPosition(id, player())
-})
-socket.on("removePlayer", (id) => {
-    players.delete(id)
-})
+const lineWidthOptions = {
+    small: 1,
+    med: 5,
+    large: 10,
+}
 
+//functions
 function translatedX(x) {
     var rect = canvas.getBoundingClientRect()
     var factor = canvas.width / rect.width
@@ -39,16 +37,15 @@ function translatedY(y) {
     return factor * (y - rect.top)
 }
 
-//variables
-const widths = {
-    small: 1,
-    med: 5,
-    large: 10,
+function resetPlayerPosition() {
+    console.log("***RESET***")
+    return {
+        lastPos: null,
+    }
 }
 
-//functions
 function drawLine(position, lastPosition, { lineWidth, lineCap, strokeStyle }) {
-    ctx.lineWidth = widths[`${lineWidth}`]
+    ctx.lineWidth = lineWidthOptions[`${lineWidth}`]
     ctx.lineCap = lineCap
     ctx.strokeStyle = strokeStyle
 
@@ -106,6 +103,15 @@ $(".size").on("click", (e) => {
 
 /**SOCKET LISTENRS - ie receiving emits from server */
 
+socket.on("addPlayer", (id) => {
+    //make player
+    updateLastPosition(id, resetPlayerPosition())
+})
+
+socket.on("removePlayer", (id) => {
+    players.delete(id)
+})
+
 //this handles mousedown and mousemove from client - either starting or drawing their line
 socket.on("draw", (clientDraw) => {
     const { clientX, clientY, options, id } = clientDraw
@@ -121,8 +127,7 @@ socket.on("draw", (clientDraw) => {
 //this handles mouseup from client - they are done drawing their line
 socket.on("stopDraw", (id) => {
     //clear the clients old x y
-    updateLastPosition(id, player()) //overwrite
-    // players.set(id, player())
+    updateLastPosition(id, resetPlayerPosition()) //overwrite
     console.log(players)
 })
 socket.on("clear", () => {
